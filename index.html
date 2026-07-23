@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pic Puzzle</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="app">
+  <div class="stage-frame">
+    <div class="lights top" id="lightsTop"></div>
+    <div class="lights bottom" id="lightsBottom"></div>
+    <div class="lights left" id="lightsLeft"></div>
+    <div class="lights right" id="lightsRight"></div>
+
+    <!-- SPLASH -->
+    <section class="screen active" id="screen-splash">
+      <div class="spotlight-sweep"></div>
+      <div class="mascot">🦉</div>
+      <h1 class="splash-title">Pic Puzzle</h1>
+      <p class="splash-sub">Ayo selesaikan kuisnya</p>
+      <button class="btn" onclick="goMenu()">Ketuk untuk mulai ▶</button>
+    </section>
+
+    <!-- MENU -->
+    <section class="screen" id="screen-menu">
+      <div class="brand-row">
+        <div class="mascot">🦉</div>
+        <div>
+          <div class="menu-title">Pic Puzzle</div>
+          <div class="menu-sub">Ayo Mulai Tebak gambar</div>
+        </div>
+      </div>
+      <button class="btn" onclick="showScreen('screen-levels')">🎬 Mulai Main</button>
+      <button class="btn secondary" onclick="showScreen('screen-howto')">📖 Cara Bermain</button>
+      <button class="btn secondary" onclick="showScreen('screen-settings')">⚙️ Pengaturan</button>
+      <button class="btn secondary" onclick="exitGame()">🚪 Keluar</button>
+    </section>
+
+    <!-- LEVEL SELECT -->
+    <section class="screen" id="screen-levels">
+      <button class="back-link" onclick="showScreen('screen-menu')">← Menu</button>
+      <div class="eyebrow eyebrow-lg">Pilih Level</div>
+      <div id="levelList"></div>
+    </section>
+
+    <!-- HOW TO -->
+    <section class="screen" id="screen-howto">
+      <button class="back-link" onclick="showScreen('screen-menu')">← Menu</button>
+      <div class="eyebrow">Panduan</div>
+      <h2 style="margin-bottom:16px; font-size:20px;">Cara Bermain</h2>
+      <div class="howto-item"><div class="ic">🖼️</div><p>Sebagian gambar akan ditutup. Coba tebak, itu gambar apa!</p></div>
+      <div class="howto-item"><div class="ic">🔍</div><p>Kalau bingung, baca ciri-cirinya — itu petunjuk singkat tentang gambar tersebut.</p></div>
+      <div class="howto-item"><div class="ic">🔤</div><p>Dua huruf jawaban sudah dibocorkan sebagai petunjuk. Ketik jawaban LENGKAP (semua huruf) menggunakan keyboard di hp atau komputermu sendiri!</p></div>
+      <div class="howto-item"><div class="ic">❤️</div><p>Kamu punya 3 nyawa. Salah menjawab? Tenang, kamu masih boleh coba lagi tanpa kehilangan nyawa. Kalau waktu habis sebelum kamu berhasil menjawab dengan benar, nyawa berkurang 1 dan skor berkurang 15 poin.</p></div>
+      <div class="howto-item"><div class="ic">💡</div><p>Masih bingung juga? Tekan tombol Petunjuk untuk membuka satu huruf tambahan. Ingat, kesempatan ini hanya berlaku 1 kali tiap level, ya!</p></div>
+      <div class="howto-item"><div class="ic">🏆</div><p>Jawab 2 soal dengan BENAR untuk lulus dan membuka level berikutnya. Kalau salah atau waktu habis, nyawa berkurang dan soal lain akan muncul secara acak.</p></div>
+      <button class="btn" onclick="showScreen('screen-menu')">Mengerti!</button>
+    </section>
+
+    <!-- SETTINGS -->
+    <section class="screen" id="screen-settings">
+      <button class="back-link" onclick="showScreen('screen-menu')">← Menu</button>
+      <div class="eyebrow">Pengaturan</div>
+      <h2 style="margin-bottom:18px; font-size:20px;">Suara &amp; Musik</h2>
+
+      <div class="toggle-row">
+        <span>Suara Efek (SFX)</span>
+        <label class="switch">
+          <input type="checkbox" id="sfxToggle" checked onchange="onSfxToggle()">
+          <span class="slider-round"></span>
+        </label>
+      </div>
+      <div class="field">
+        <label><span>Volume SFX</span><span id="sfxVal">70%</span></label>
+        <input type="range" id="sfxSlider" min="0" max="100" value="70" oninput="onSfxSlider(this.value)">
+      </div>
+
+      <div class="toggle-row">
+        <span>Musik Latar</span>
+        <label class="switch">
+          <input type="checkbox" id="musicToggle" checked onchange="onMusicToggle()">
+          <span class="slider-round"></span>
+        </label>
+      </div>
+      <div class="field">
+        <label><span>Volume Musik</span><span id="musicVal">30%</span></label>
+        <input type="range" id="musicSlider" min="0" max="100" value="30" oninput="onMusicSlider(this.value)">
+      </div>
+
+      <button class="btn" onclick="showScreen('screen-menu')">Simpan &amp; Kembali</button>
+    </section>
+
+    <!-- GAMEPLAY -->
+    <section class="screen" id="screen-game">
+      <div class="game-topbar">
+        <button class="icon-btn" onclick="openPause()" title="Menu">⋮</button>
+        <div class="category-tag" id="levelTag" style="margin:0;">Hewan</div>
+        <button class="icon-btn" id="musicBtn" onclick="toggleMusicBtn()" title="Musik">🔊</button>
+      </div>
+      <div class="hud">
+        <div class="hearts" id="heartsDisplay">❤️❤️❤️</div>
+        <div class="score" id="scoreDisplay">Skor: 0</div>
+      </div>
+      <div class="timer-track"><div class="timer-fill" id="timerFill"></div></div>
+
+      <div class="clue-box"><span class="ic">🔍</span><span id="clueText">Ciri-ciri akan muncul di sini.</span></div>
+
+      <div class="picture-frame">
+        <img class="picture-emoji" id="pictureEmoji" src="assets/images/kucing.svg" alt="gambar tebakan">
+        <div class="hoot-hint">🦉</div>
+      </div>
+
+      <div class="feedback-banner" id="feedbackBanner"></div>
+
+      <div class="answer-slots" id="answerSlots" onclick="focusTypedInput()"></div>
+      <div class="type-input-wrap">
+        <input type="text" id="typedInput" class="type-input" placeholder="Ketik jawabanmu di sini"
+          autocomplete="off" autocapitalize="characters" autocorrect="off" spellcheck="false" oninput="onTypedInput(this)">
+      </div>
+
+      <div class="action-row">
+        <button class="btn small" style="background:linear-gradient(180deg,#fff2b8,#ffe066); color:#5c4200; box-shadow:0 6px 0 #d4a800, 0 10px 18px rgba(0,0,0,.3);" id="hintBtn" onclick="pakaiHint()">💡 Petunjuk (1 kesempatan)</button>
+      </div>
+    </section>
+
+    <!-- RESULTS -->
+    <section class="screen" id="screen-results">
+      <div class="results-hero">
+        <div class="eyebrow" id="resultsEyebrow">Level Selesai</div>
+        <h2 id="resultsTitle" style="font-size:24px;">Hebat!</h2>
+        <div class="stars" id="resultsStars">⭐⭐⭐</div>
+      </div>
+      <div class="stat-grid">
+        <div class="stat-box"><div class="num" id="statScore">0</div><div class="lbl">Total Skor</div></div>
+        <div class="stat-box"><div class="num" id="statCorrect">0</div><div class="lbl">Jawaban Benar</div></div>
+      </div>
+      <button class="btn" id="btnNextLevel" onclick="goNextLevel()">➡️ Level Berikutnya</button>
+      <button class="btn secondary" onclick="retryLevel()">🔁 Main Lagi</button>
+      <button class="btn secondary" onclick="showScreen('screen-menu')">🏠 Kembali ke Menu</button>
+    </section>
+
+  </div>
+</div>
+
+<div class="modal-overlay" id="pauseOverlay">
+  <div class="modal-box">
+    <div style="font-size:44px; margin-bottom:6px;">⏸️</div>
+    <h3>Game Dijeda</h3>
+    <button class="btn" onclick="resumeGame()">▶️ Lanjutkan</button>
+    <button class="btn secondary" onclick="pauseGoHome()">🏠 Kembali ke Home</button>
+    <button class="btn danger" onclick="pauseExitGame()">🚪 Keluar dari Game</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="script.js"></script>
+</body>
+</html>
